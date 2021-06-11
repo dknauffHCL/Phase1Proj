@@ -2,6 +2,7 @@ package com.knauff.service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.knauff.model.Role;
 import com.knauff.model.User;
 import com.knauff.repository.UserRepository;
 
@@ -29,16 +29,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		
 		if (user == null) throw new UsernameNotFoundException(username);
 		
-		Set<GrantedAuthority> grantedAuths = new HashSet<>();
-		for (Role role : user.getRoles()) {
-			
-			grantedAuths.add(new SimpleGrantedAuthority(role.getName()));
-		}
+		Set<GrantedAuthority> grantedAuth =
+				user.getRoles()
+				.stream().map(x -> new SimpleGrantedAuthority(x.getName()))
+				.collect(Collectors.toCollection(HashSet::new));
 		
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), 
-				user.getPassword(), grantedAuths);
+				user.getPassword(), grantedAuth);
 	}
 }
-
-// implement streams
-// log4j?

@@ -23,6 +23,10 @@ body {
 span {
 	color: red;
 }
+
+.container {
+text-align: right;
+}
 </style>
 
 <body>
